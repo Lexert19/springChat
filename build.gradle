@@ -14,11 +14,23 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+	//testImplementation 'org.springframework.security:spring-security-test'
+	// https://mvnrepository.com/artifact/io.rsocket/rsocket-transport-netty
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-rsocket
+	//implementation group: 'org.springframework.boot', name: 'spring-boot-starter-rsocket', version: '3.0.2'
+
+	// https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket
+	implementation group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.3'
+
+
+	//implementation "org.springframework.integration:spring-integration-stomp:6.0.3"
+
+	// https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
+	testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.9.2'
 }
 
 tasks.named('test') {
