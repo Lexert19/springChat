@@ -95,5 +95,6 @@ public class ChatService {
         User user = users.get(session.getId());
         user.removeFromChats();
         users.remove(session.getId());
+        //?
     }
 }
