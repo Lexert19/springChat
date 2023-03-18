@@ -36,7 +36,7 @@ public class ChatConfig{
     @Bean
     public HandlerMapping handlerMapping() {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/", chatHandler());
+        map.put("/chat", chatHandler());
 
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
         mapping.setUrlMap(map);

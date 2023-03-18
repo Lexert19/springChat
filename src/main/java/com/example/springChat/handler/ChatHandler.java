@@ -1,12 +1,12 @@
 package com.example.springChat.handler;
 
 
-import com.example.springChat.model.event.JoinChatEvent;
-import com.example.springChat.model.event.SendChatEvent;
-import com.example.springChat.model.event.UpdateChatEvent;
+import com.example.springChat.element.event.*;
 import com.example.springChat.service.ChatService;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
@@ -17,43 +17,56 @@ public class ChatHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
+
+
         if (chatService.addUser(session)) {
-            return session.send(session.receive().doFinally(msg -> {
+            return session.send(e -> session.textMessage(""))
+                    .and(session.receive().doFinally(msg ->{
+                        chatService.removeUser(session);
+                        session.close();
+
+                    })
+                    .map(msg -> {
+                        return parseToEvent(msg.getPayloadAsText(), session);
+                    }).flatMap(e -> e));
+
+           /* return session.send(session.receive().doFinally(msg -> {
                 chatService.removeUser(session);
                 session.close();
 
             }).map(msg -> {
                 parseToEvent(msg.getPayloadAsText(), session);
+
                 return "";
-            }).map(session::textMessage));
+            }).map(str -> session.textMessage(str)));*/
         }
         return Mono.empty();
-
-
-
-
-       /* return session.send(session.receive()
-                .map(msg -> {
-                    //String message = msg.getPayloadAsText();
-                    parseToEvent(msg.getPayloadAsText(), session);
-                    return "";
-                })
-                .map(session::textMessage));*/
-        //return  session.send(Mono.just(session.textMessage(": ")));
     }
 
-    public void parseToEvent(String message, WebSocketSession session) {
-        if (message.charAt(0) == UpdateChatEvent.id) {
+    public Mono<Void> parseToEvent(String message, WebSocketSession session) {
+        char id = message.charAt(0);
+        if (id == UpdateChatEvent.id) {
             UpdateChatEvent updateChatEvent = new UpdateChatEvent(message, session);
             chatService.updateChatRequest(updateChatEvent);
-        } else if (message.charAt(0) == SendChatEvent.id) {
+
+        } else if (id == SendChatEvent.id) {
             SendChatEvent sendChatEvent = new SendChatEvent(message, session);
             chatService.addMessage(sendChatEvent);
-        } else if (message.charAt(0) == JoinChatEvent.ID) {
+
+        } else if (id == JoinChatEvent.ID) {
             JoinChatEvent joinChatEvent = new JoinChatEvent(message, session);
             chatService.joinToChat(joinChatEvent);
-        }
 
+        }else if(id == CreateChatEvent.ID){
+            CreateChatEvent createChatEvent = new CreateChatEvent(message, session);
+            chatService.createChat(createChatEvent);
+
+        }else if(id == SaveChatEvent.ID){
+            SaveChatEvent saveChatEvent = new SaveChatEvent(message, session);
+            return chatService.saveChatIntoDataBase(saveChatEvent);
+
+        }
+        return Mono.empty();
 
     }
 

@@ -1,4 +1,4 @@
-package com.example.springChat.model;
+package com.example.springChat.element;
 
 import org.springframework.web.reactive.socket.WebSocketSession;
 

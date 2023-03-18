@@ -1,25 +1,35 @@
 package com.example.springChat.model;
 
-import com.example.springChat.model.event.UpdateChatEvent;
+import com.example.springChat.element.Message;
+import com.example.springChat.element.event.UpdateChatEvent;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
+@Table(name="chats")
 public class Chat {
-    private long address;
-    private LinkedList<Message> messages;
-    private LinkedList<UpdateChatEvent> updateChatRequests;
-    private HashMap<String, WebSocketSession> attachedSessions;
+    @Id
+    private int id;
+
+    private String rawChat;
+    @Transient
+    private List<Message> messages;
+    @Transient
+    private List<UpdateChatEvent> updateChatRequests;
+    @Transient
+    private Map<String, WebSocketSession> attachedSessions;
 
 
 
     public Chat() {
-        this.messages = new LinkedList<>();
-        this.updateChatRequests = new LinkedList<>();
-        this.attachedSessions = new HashMap<>();
+        //this.messages = new LinkedList<>();
+        this.messages = Collections.synchronizedList(new LinkedList<Message>());
+        this.updateChatRequests = Collections.synchronizedList(new LinkedList<>());
+        this.attachedSessions = Collections.synchronizedMap(new HashMap<>());
     }
 
     public void joinChat(WebSocketSession session){
@@ -48,7 +58,7 @@ public class Chat {
         updateChatRequests.add(event);
     }
 
-    public LinkedList<UpdateChatEvent> getUpdateChatRequests(){
+    public List<UpdateChatEvent> getUpdateChatRequests(){
         return updateChatRequests;
     }
 
@@ -56,19 +66,28 @@ public class Chat {
         updateChatRequests.clear();
     }
 
-    public LinkedList<Message> getMessages() {
+    public List<Message> getMessages() {
         return messages;
     }
 
-    public HashMap<String, WebSocketSession> getAttachedSessions() {
+    public Map<String, WebSocketSession> getAttachedSessions() {
         return attachedSessions;
     }
 
-    public long getAddress() {
-        return address;
+    public int getId() {
+        return id;
     }
 
-    public void setAddress(long address) {
-        this.address = address;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void updateRawChat(){
+        StringBuilder text = new StringBuilder();
+        for(Message message : getMessages()){
+            text.append(message.getMessage());
+            text.append('|');
+        }
+        this.rawChat = text.toString();
     }
 }

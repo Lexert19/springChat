@@ -3,21 +3,48 @@ package com.example.springChat;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
-import org.junit.Assert;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
-import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.*;
 
 public class ChatTest {
+    private String jwtToken;
 
-    public static void main(String[] args) throws URISyntaxException, InterruptedException {
-        ChatTest chatTest = new ChatTest();
-        chatTest.joinAndSend();
+    public static void main(String[] args) throws URISyntaxException, InterruptedException, IOException {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try{
+                    ChatTest chatTest = new ChatTest();
+                    chatTest.register();
+                    chatTest.login();
+                    chatTest.joinAndSend();
+                }catch (Exception e){}
+
+            }
+        }.start();
+
+
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try{
+                    ChatTest chatTest = new ChatTest();
+                    chatTest.register();
+                    chatTest.login();
+                    chatTest.joinAndSend();
+                }catch (Exception e){}
+
+            }
+        }.start();
+        /*ChatTest chatTest = new ChatTest();
+        chatTest.register();
+        chatTest.login();
+        chatTest.joinAndSend();*/
     }
 
     public void joinAndSend() throws URISyntaxException, InterruptedException {
@@ -25,13 +52,50 @@ public class ChatTest {
 
     }
 
+    public void login() throws IOException {
+        URL url = new URL("http://localhost:8080/auth/login?name=nwm0&password=1234");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        //this.jwtToken = con.getHeaderField("token");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        StringBuilder content = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        this.jwtToken = content.toString();
+        System.out.println(this.jwtToken);
+
+    }
+
+    public void register() throws IOException {
+        URL url = new URL("http://localhost:8080/auth/register?name=nwm0&email=nwm0&password=1234");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.getContent();
+    }
+
     public void createClient() throws URISyntaxException, InterruptedException {
-        WebSocketClient webSocketClient = new WebSocketClient(new URI("ws://localhost:8080/"), new Draft_6455()) {
+        WebSocketClient webSocketClient = new WebSocketClient(new URI("ws://localhost:8080/chat"), new Draft_6455()) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                send("j1234567890");
-                send("s1234567890sendAndReceive");
-                send("s1234567890sendAndReceive");
+                send("c0000000001");
+                send("j0000000001");
+                for(int i=0; i<20000; i++){
+                    send("s0000000001sendAndReceive");
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                for(int i=0; i<1; i++){
+                    send("d0000000001");
+                }
+                send("d0000000001");
+                //send("u0000000001");
+
             }
 
             @Override
@@ -54,6 +118,7 @@ public class ChatTest {
 
             }
         };
+        webSocketClient.addHeader("token", jwtToken);
         webSocketClient.connectBlocking();
         while (webSocketClient.isOpen()){}
     }
