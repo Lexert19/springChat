@@ -54,7 +54,7 @@ public class AuthController {
                     if(!bCryptPasswordEncoder.matches(password, user.getPassword()))
                         return ResponseEntity.ok("Nie prawidłowe hasło");
 
-                    String jwt = jwtSigner.createJwt(name);
+                    String jwt = jwtSigner.createJwt(name, user.getId());
                     return ResponseEntity.ok(jwt);
                 })
                 .switchIfEmpty(Mono.defer(()->{

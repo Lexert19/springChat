@@ -2,6 +2,8 @@ package com.example.springChat.model;
 
 import com.example.springChat.element.Message;
 import com.example.springChat.element.event.UpdateChatEvent;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
@@ -9,60 +11,102 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Table(name="chats")
+@Table(name = "chats")
 public class Chat {
     @Id
     private int id;
+    private String jsonMessages;
+    private String jsonUsers;
 
-    private String rawChat;
+    @Transient
+    private Map<Integer, ChatAccess> users;
     @Transient
     private List<Message> messages;
     @Transient
     private List<UpdateChatEvent> updateChatRequests;
     @Transient
     private Map<String, WebSocketSession> attachedSessions;
+    @Transient
+    private Gson gson;
 
+    public Chat(User owner) {
+        users = new ConcurrentHashMap<>();
+        gson = new Gson();
+        messages = Collections.synchronizedList(new LinkedList<>());
+        updateChatRequests = Collections.synchronizedList(new LinkedList<>());
+        attachedSessions = new ConcurrentHashMap<>();
+        ChatAccess access = new ChatAccess(owner.getId(), ChatAccess.Role.OWNER);
+        users.put(owner.getId(), access);
 
-
-    public Chat() {
-        //this.messages = new LinkedList<>();
-        this.messages = Collections.synchronizedList(new LinkedList<Message>());
-        this.updateChatRequests = Collections.synchronizedList(new LinkedList<>());
-        this.attachedSessions = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public void joinChat(WebSocketSession session){
-        attachedSessions.put(session.getId(), session);
+    public boolean addUser(User sender, User user, ChatAccess.Role role) {
+        if (users.get(sender.getId()).role == ChatAccess.Role.OWNER) {
+            ChatAccess access = new ChatAccess(user.getId(), role);
+            users.put(user.getId(), access);
+            return true;
+        }
+        return false;
     }
 
-    public void addMessage(String message, WebSocketSession session){
-        Message msg = new Message(message, session);
+    public boolean joinChat(User user) {
+        if (!users.containsKey(user.getId()))
+            return false;
+        attachedSessions.put(user.getSession().getId(), user.getSession());
+        return true;
+    }
+
+    public boolean addMessage(String message, int userId) {
+        if (!users.containsKey(userId))
+            return false;
+
+        Message msg = new Message(userId, message);
         messages.add(msg);
         sendToAll(msg);
-
+        return true;
     }
 
-    public void sendToAll(Message message){
-        for(Map.Entry<String, WebSocketSession> entry : attachedSessions.entrySet()){
+    public void sendToAll(Message message) {
+        for (Map.Entry<String, WebSocketSession> entry : attachedSessions.entrySet()) {
             WebSocketSession session = entry.getValue();
-            if(session.isOpen()){
+            if (session.isOpen()) {
                 session.send(Mono.just(session.textMessage(message.getMessage()))).subscribe();
-            }else {
+            } else {
                 attachedSessions.remove(session.getId());
             }
         }
     }
 
-    public void addChatRequest(UpdateChatEvent event){
-        updateChatRequests.add(event);
+    public void convertMessagesToJsonMessages() {
+        jsonMessages = gson.toJson(messages);
     }
 
-    public List<UpdateChatEvent> getUpdateChatRequests(){
+    public void convertJsonMessagesToMessages() {
+        messages = gson.fromJson(jsonMessages, new TypeToken<LinkedList<Message>>() {}.getType());
+    }
+
+    public void convertUsersToJsonUsers(){
+        jsonUsers = gson.toJson(users);
+    }
+
+    public void convertJsonUsersToUsers(){
+        users = gson.fromJson(jsonUsers,  new TypeToken<Map<Integer, ChatAccess>>() {}.getType());
+    }
+
+    public boolean addChatRequest(UpdateChatEvent event, int userId) {
+        if (!users.containsKey(userId))
+            return false;
+        updateChatRequests.add(event);
+        return true;
+    }
+
+    public List<UpdateChatEvent> getUpdateChatRequests() {
         return updateChatRequests;
     }
 
-    public void clearChatRequests(){
+    public void clearChatRequests() {
         updateChatRequests.clear();
     }
 
@@ -82,12 +126,4 @@ public class Chat {
         this.id = id;
     }
 
-    public void updateRawChat(){
-        StringBuilder text = new StringBuilder();
-        for(Message message : getMessages()){
-            text.append(message.getMessage());
-            text.append('|');
-        }
-        this.rawChat = text.toString();
-    }
 }

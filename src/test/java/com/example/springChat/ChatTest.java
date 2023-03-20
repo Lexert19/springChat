@@ -13,13 +13,15 @@ public class ChatTest {
     private String jwtToken;
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException, IOException {
+        ChatTest chatTest = new ChatTest();
+        chatTest.register();
+
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 try{
                     ChatTest chatTest = new ChatTest();
-                    chatTest.register();
                     chatTest.login();
                     chatTest.joinAndSend();
                 }catch (Exception e){}
@@ -28,19 +30,18 @@ public class ChatTest {
         }.start();
 
 
-        new Thread(){
+       /* new Thread(){
             @Override
             public void run() {
                 super.run();
                 try{
                     ChatTest chatTest = new ChatTest();
-                    chatTest.register();
                     chatTest.login();
                     chatTest.joinAndSend();
                 }catch (Exception e){}
 
             }
-        }.start();
+        }.start();*/
         /*ChatTest chatTest = new ChatTest();
         chatTest.register();
         chatTest.login();
@@ -53,7 +54,7 @@ public class ChatTest {
     }
 
     public void login() throws IOException {
-        URL url = new URL("http://localhost:8080/auth/login?name=nwm0&password=1234");
+        URL url = new URL("http://localhost:8080/auth/login?name=nwm1&password=1234");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         //this.jwtToken = con.getHeaderField("token");
@@ -70,7 +71,7 @@ public class ChatTest {
     }
 
     public void register() throws IOException {
-        URL url = new URL("http://localhost:8080/auth/register?name=nwm0&email=nwm0&password=1234");
+        URL url = new URL("http://localhost:8080/auth/register?name=nwm1&email=nwm1&password=1234");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.getContent();
@@ -81,30 +82,31 @@ public class ChatTest {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 send("c0000000001");
+                send("l0000000001"+jwtToken);
                 send("j0000000001");
-                for(int i=0; i<20000; i++){
+                send("a00000000013");
+                send("u0000000001");
+                /*for(int i=0; i<3; i++){
                     send("s0000000001sendAndReceive");
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
-                for(int i=0; i<1; i++){
+                }*/
+                /*for(int i=0; i<1; i++){
                     send("d0000000001");
                 }
-                send("d0000000001");
+                send("d0000000001");*/
+                System.out.println("done");
                 //send("u0000000001");
 
             }
 
             @Override
             public void onMessage(String message) {
-                System.out.println(""+message);
-                //Assert.assertEquals("sendAndReceive", message);
+                System.out.print(message);
                 if(!message.equals("")){
-                    //Assert.assertEquals("sendAndReceive", message);
-                    //close();
                 }
             }
 
@@ -120,6 +122,8 @@ public class ChatTest {
         };
         webSocketClient.addHeader("token", jwtToken);
         webSocketClient.connectBlocking();
-        while (webSocketClient.isOpen()){}
+        while (webSocketClient.isOpen()){
+            Thread.sleep(1);
+        }
     }
 }

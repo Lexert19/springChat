@@ -12,7 +12,7 @@ public class ChatRepositoryService {
     private ChatRepository chatRepository;
 
     public Mono<Void> saveChatIntoRepository(Chat chat){
-        chat.updateRawChat();
+        chat.convertMessagesToJsonMessages();
         return chatRepository.save(chat).then();
     }
 

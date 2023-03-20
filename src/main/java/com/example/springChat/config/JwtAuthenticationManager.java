@@ -17,7 +17,7 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        System.out.println(jwtSigner.createJwt((String) authentication.getCredentials()).toString());
+        //System.out.println(jwtSigner.createJwt((String) authentication.getCredentials()).toString());
 
         return Mono.just(authentication)
                 .map(e ->{

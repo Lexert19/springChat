@@ -3,10 +3,8 @@ package com.example.springChat.handler;
 
 import com.example.springChat.element.event.*;
 import com.example.springChat.service.ChatService;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
@@ -29,16 +27,6 @@ public class ChatHandler implements WebSocketHandler {
                     .map(msg -> {
                         return parseToEvent(msg.getPayloadAsText(), session);
                     }).flatMap(e -> e));
-
-           /* return session.send(session.receive().doFinally(msg -> {
-                chatService.removeUser(session);
-                session.close();
-
-            }).map(msg -> {
-                parseToEvent(msg.getPayloadAsText(), session);
-
-                return "";
-            }).map(str -> session.textMessage(str)));*/
         }
         return Mono.empty();
     }
@@ -65,6 +53,12 @@ public class ChatHandler implements WebSocketHandler {
             SaveChatEvent saveChatEvent = new SaveChatEvent(message, session);
             return chatService.saveChatIntoDataBase(saveChatEvent);
 
+        }else if(id == LoginChatEvent.ID){
+            LoginChatEvent loginChatEvent = new LoginChatEvent(message, session);
+            chatService.loginToChat(loginChatEvent);
+        }else if(id == AddUserToChatEvent.ID){
+            AddUserToChatEvent addUserToChatEvent = new AddUserToChatEvent(message, session);
+            chatService.addUserToChat(addUserToChatEvent);
         }
         return Mono.empty();
 

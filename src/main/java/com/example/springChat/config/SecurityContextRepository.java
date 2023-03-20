@@ -54,7 +54,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
         authorities.add(authority);
 
-        Authentication auth = new UsernamePasswordAuthenticationToken("token", "token", authorities);
+        Authentication auth = new UsernamePasswordAuthenticationToken("", "", authorities);
         return authenticationManager.authenticate(auth).map(authentication -> {
             return new SecurityContextImpl(auth);
         });

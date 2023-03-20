@@ -26,15 +26,21 @@ function connect()
   ws = new WebSocket(url, [token]);
   ws.onopen = function() {
     log('Info: Connection Established.');
+    echo("l0000000001"+token)
     echo("c0000000001");
+    //echo("a00000000012")
     echo("j0000000001");
+    echo("s0000000001Siema 123")
+    echo("a00000000012")
+    echo("d0000000001")
   };
 
   ws.onmessage = function(event) {
     count++;
-    if(count > 30000){
-        console.log(event.data)
-    }
+    console.log(event.data);
+//    if(count > 95000){
+//        console.log(event.data)
+//    }
   };
 
   ws.onclose = function(event) {
