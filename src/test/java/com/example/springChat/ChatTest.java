@@ -8,9 +8,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class ChatTest {
     private String jwtToken;
+    private HttpClient httpClient;
+
+    public ChatTest() {
+        httpClient = HttpClient.newHttpClient();
+    }
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException, IOException {
         ChatTest chatTest = new ChatTest();
@@ -23,7 +31,9 @@ public class ChatTest {
                 try{
                     ChatTest chatTest = new ChatTest();
                     chatTest.login();
-                    chatTest.joinAndSend();
+                    chatTest.getUserId("nwm1");
+                    chatTest.searchName("nw");
+                    //chatTest.joinAndSend();
                 }catch (Exception e){}
 
             }
@@ -68,6 +78,33 @@ public class ChatTest {
         this.jwtToken = content.toString();
         System.out.println(this.jwtToken);
 
+
+
+    }
+
+    public void getUserId(String name) throws IOException, URISyntaxException, InterruptedException {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        URL url = new URL("http://localhost:8080/searchUserId?name="+name);
+        HttpRequest request = HttpRequest.newBuilder()
+                .header("token", jwtToken)
+                .uri(url.toURI()).build();
+        //HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        //con.setRequestMethod("GET");
+        //this.jwtToken = con.getHeaderField("token");
+        System.out.println(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body());
+
+    }
+
+    public void searchName(String name) throws IOException, URISyntaxException, InterruptedException {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        URL url = new URL("http://localhost:8080/searchUser?name="+name);
+        HttpRequest request = HttpRequest.newBuilder()
+                .header("token", jwtToken)
+                .uri(url.toURI()).build();
+        //HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        //con.setRequestMethod("GET");
+        //this.jwtToken = con.getHeaderField("token");
+        System.out.println(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body());
     }
 
     public void register() throws IOException {

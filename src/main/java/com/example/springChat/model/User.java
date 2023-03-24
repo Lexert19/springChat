@@ -1,5 +1,6 @@
 package com.example.springChat.model;
 
+import com.google.gson.annotations.Expose;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
@@ -11,12 +12,12 @@ import java.util.Map;
 @Table(name = "users")
 public class User {
     @Id
+    @Expose
     private int id;
+    @Expose
     private String name;
     private String email;
     private String password;
-
-
 
 
     @Transient

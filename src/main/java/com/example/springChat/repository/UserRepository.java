@@ -16,11 +16,8 @@ public interface UserRepository extends R2dbcRepository<User, Integer> {
 
     @Query("SELECT * FROM users WHERE name = :name")
     Mono<User> findByName(String name);
-   /* Mono<User> findById(int id);
 
-    Flux<User> findAll();
 
-    Mono<User> findByNameOrEmail(String name, String email);
-    Mono<User> findByName(String name);*/
-    //Mono<User> findByEmail(String email);
+    @Query("SELECT id, name FROM users WHERE name LIKE concat('%',:name,'%')")
+    Flux<User> findByNameContains(String name);
 }

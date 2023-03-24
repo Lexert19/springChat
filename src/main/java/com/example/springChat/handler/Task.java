@@ -18,7 +18,7 @@ public class Task {
 
     @Scheduled(fixedDelay = 100)
     public void scheduleFixedDelayTask() {
-        chatService.updateChats();
+        //chatService.updateChats();
         //chatService.sendMessages();
     }
 

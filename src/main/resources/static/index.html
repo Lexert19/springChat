@@ -2,14 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Spring Chat</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-    <h1>Index</h1>
+<div class="container-fluid p-0" >
+    <div class="row mh-100">
+        <nav class="col-md-2 d-none d-md-block sidebar bg-light min-vh-100 p-0">
+            <div class="sidebar-sticky">
+                <div class="row mb-1 mt-1 m-2 mt-2 mb-2">
+                    <div class="w-100">
+                        <input class="form-control mr-sm-2 col-md-1" type="text" placeholder="Search">
+                    </div>
+                    <!--<div class="w-25 p-0">
+                        <button class="btn btn-outline-success my-1 my-sm-0" type="submit">&#128270;</button>
+                    </div>-->
+                </div>
+                <div class="list-group list-group-flush overflow-auto d-flex" style="height: 90vh;">
+                    <a class="list-group-item list-group-item-action lh-tight py-3"  href="">TEXT</a>
 
-<!--
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.1.0-next/stomp.js"></script>
--->
+
+                </div>
+
+
+                </ul>
+            </div>
+        </nav>
+
+        <main role="main" class="col-md-10 ml-sm-auto col-lg-7 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">This is a sample card.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">This is a sample card.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
     <script src="/static/chat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

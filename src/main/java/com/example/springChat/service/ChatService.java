@@ -33,13 +33,19 @@ public class ChatService {
         users = new ConcurrentHashMap<>();
     }
 
-    public void updateChatRequest(UpdateChatEvent event){
+    public void updateChat(UpdateChatEvent event){
+        Chat chat = chatMap.get(event.getAddress());
+        User user = users.get(event.getSession().getId());
+        chat.updateChat(user);
+    }
+
+   /* public void updateChatRequest(UpdateChatEvent event){
         Chat chat = chatMap.get(event.getAddress());
         User user = users.get(event.getSession().getId());
         chat.addChatRequest(event, user.getId());
-    }
+    }*/
 
-    public void updateChats(){
+    /*public void updateChats(){
         for(Map.Entry<Integer, Chat> chat : chatMap.entrySet()){
             for(UpdateChatEvent event : chat.getValue().getUpdateChatRequests()){
                 WebSocketSession session = event.getSession();
@@ -53,7 +59,7 @@ public class ChatService {
             }
             chat.getValue().clearChatRequests();
         }
-    }
+    }*/
 
     public void addMessage(SendChatEvent event){
         User user = users.get(event.getSession().getId());
@@ -96,6 +102,25 @@ public class ChatService {
         }
         /*chat.joinChat(user);
         chat.joinChat(event.getSession());*/
+    }
+
+    public void sendAudio(SendAudioChatEvent event){
+        Chat chat = chatMap.get(event.getAddress());
+        User user = users.get(event.getSession().getId());
+        chat.voiceChatSendAudio(event, user);
+    }
+
+
+    public void joinVoiceChat(JoinVoiceChatEvent event){
+        Chat chat = chatMap.get(event.getAddress());
+        User user = users.get(event.getSession().getId());
+        chat.joinToVoiceChat(user);
+    }
+
+    public void leaveVoiceChat(LeaveVoiceChatEvent event){
+        Chat chat = chatMap.get(event.getAddress());
+        User user = users.get(event.getSession().getId());
+        chat.leaveVoiceChat(user);
     }
 
     public boolean createChat(CreateChatEvent event){

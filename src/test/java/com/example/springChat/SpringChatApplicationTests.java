@@ -40,7 +40,6 @@ class SpringChatApplicationTests {
 	@Autowired
 	private WebTestClient client;
 
-
 	@BeforeEach
 	public void setup() throws Exception {
 
@@ -55,27 +54,6 @@ class SpringChatApplicationTests {
 		client.get().uri("http://localhost:8080/static/index.html")
 				.exchange()
 				.expectStatus().isOk();
-
-	}
-
-	@Test
-	public void sendAndReceiveMessage(){
-		ReactorNettyWebSocketClient client = new ReactorNettyWebSocketClient();
-		client.execute(
-				URI.create("ws://localhost:8080/"),
-				session -> session.send(
-						Mono.just(session.textMessage("s1234567890sendAndReceive")))
-						.thenMany(session.send(Mono.just(session.textMessage("u1234567890"))))
-						.thenMany(session.receive()
-								.map(WebSocketMessage::getPayloadAsText)
-								.map(message ->{
-									System.out.println("???"+message);
-									//assert message.equals("sendAndReceive");
-
-									return "";
-								}))
-						.then())
-				.block(Duration.ofMillis(1000L));
 	}
 
 }
