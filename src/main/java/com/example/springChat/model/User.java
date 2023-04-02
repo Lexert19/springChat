@@ -18,6 +18,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String role;
 
 
     @Transient
@@ -88,5 +89,13 @@ public class User {
 
     public void setSession(WebSocketSession session) {
         this.session = session;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

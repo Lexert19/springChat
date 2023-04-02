@@ -3,6 +3,7 @@ package com.example.springChat.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,28 +37,27 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
-        try{
-            String token = exchange.getRequest().getHeaders().getFirst("token");
-            if(token == null){
-                token=exchange.getRequest().getHeaders().getFirst("Sec-WebSocket-Protocol");
-            }
-            Jws<Claims> claimsJws = jwtSigner.validateJwt(token);
+        Jws<Claims> claimsJws;
 
-        }catch (Exception e){
-            Authentication authentication = new UsernamePasswordAuthenticationToken("token", "token");
-            return authenticationManager.authenticate(authentication).map(auth -> {
-                return new SecurityContextImpl(authentication);
-            });
+        String token = "";
+        token = exchange.getRequest().getHeaders().getFirst("token");
+        if(token == null){
+            token=exchange.getRequest().getHeaders().getFirst("Sec-WebSocket-Protocol");
         }
 
+        try{
+            claimsJws = jwtSigner.validateJwt(token);
+        }catch (Exception e){
+            Authentication authentication = new UsernamePasswordAuthenticationToken("","");
+            return Mono.just(new SecurityContextImpl(authentication));
+        }
 
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
-        authorities.add(authority);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                "",
+                "",
+                Collections.singleton(new SimpleGrantedAuthority(claimsJws.getBody().get("role", String.class)))
+                );
 
-        Authentication auth = new UsernamePasswordAuthenticationToken("", "", authorities);
-        return authenticationManager.authenticate(auth).map(authentication -> {
-            return new SecurityContextImpl(auth);
-        });
+        return Mono.just(new SecurityContextImpl(authentication));
     }
 }

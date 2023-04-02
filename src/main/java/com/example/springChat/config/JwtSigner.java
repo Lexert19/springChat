@@ -16,11 +16,12 @@ import java.util.Date;
 public class JwtSigner {
     private KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
 
-    public String createJwt(String name, int userId){
+    public String createJwt(String name, int userId, String role){
         return Jwts.builder()
                 .signWith(keyPair.getPrivate(), SignatureAlgorithm.RS256)
                 .setSubject(name)
                 .claim("userId", userId)
+                .claim("role", role)
                 .setIssuer("identity")
                 .setExpiration(Date.from(Instant.now().plus(Duration.ofMinutes(1))))
                 .setIssuedAt(Date.from(Instant.now()))

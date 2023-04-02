@@ -37,6 +37,7 @@ public class AuthController {
                .switchIfEmpty(Mono.defer(()->{
                    User user = new User();
                    user.setName(name);
+                   user.setRole("USER");
                    user.setEmail(email);
                    user.setPassword(bCryptPasswordEncoder.encode(password));
                    return userRepository.save(user)
@@ -54,7 +55,7 @@ public class AuthController {
                     if(!bCryptPasswordEncoder.matches(password, user.getPassword()))
                         return ResponseEntity.ok("Nie prawidłowe hasło");
 
-                    String jwt = jwtSigner.createJwt(name, user.getId());
+                    String jwt = jwtSigner.createJwt(name, user.getId(), user.getRole());
                     return ResponseEntity.ok(jwt);
                 })
                 .switchIfEmpty(Mono.defer(()->{
