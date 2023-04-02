@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface UserRepository extends R2dbcRepository<User, Integer> {
-    @Query("SELECT * FROM users WHERE name = :name OR email = :email")
+    @Query("SELECT * FROM users WHERE name = :name OR email = :email LIMIT 1")
     Mono<User> findByNameOrEmail(String name, String email);
 
 

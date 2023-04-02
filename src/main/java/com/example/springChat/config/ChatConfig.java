@@ -23,11 +23,6 @@ import java.util.Map;
 @Configuration
 @EnableScheduling
 public class ChatConfig{
-    /*@Autowired
-    private ChatService chatService;*/
-
-
-
     @Bean
     public ChatHandler chatHandler() {
         return new ChatHandler();

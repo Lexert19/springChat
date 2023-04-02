@@ -17,18 +17,7 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 
 @Configuration
 @EnableR2dbcRepositories
-//@EnableR2dbcRepositories(basePackages = {"com.example.springChat.repository.UserRepository"}, basePackageClasses = {})
 public class R2DBCConfig{
-   /* @Bean
-    ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
-
-        ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
-        initializer.setConnectionFactory(connectionFactory);
-        initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
-
-        return initializer;
-    }*/
-
     @Bean
     public ConnectionFactoryInitializer testProfileInitializer(ConnectionFactory connectionFactory) {
 
@@ -41,39 +30,4 @@ public class R2DBCConfig{
 
         return initializer;
     }
-
-
-    @Autowired
-    private Environment env;
-
-    /*@Bean
-    public ConnectionFactory connectionFactory() {
-        ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
-                .option("username", env.getProperty("spring.r2dbc.username"))
-                .option()
-
-        return ConnectionFactories..builder()
-                        .url(env.getProperty("spring.r2dbc.url"))
-                        .username(env.getProperty("spring.r2dbc.username"))
-                        .password(env.getProperty("spring.r2dbc.password"))
-                        .build();
-
-    }*/
-
-    /*@Bean
-    public H2ConnectionFactory connectionFactory() {
-        return new H2ConnectionFactory(
-                H2ConnectionConfiguration.builder()
-                        .url(env.getProperty("spring.r2dbc.url"))
-                        .username(env.getProperty("spring.r2dbc.username"))
-                        .password(env.getProperty("spring.r2dbc.password"))
-                        .build()
-        );
-
-    }*/
-
-   /* @Bean
-    public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
-        return DatabaseClient.create(connectionFactory);
-    }*/
 }

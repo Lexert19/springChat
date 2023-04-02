@@ -21,8 +21,44 @@ public class ChatTest {
     }
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException, IOException {
+        for(int i=0; i<100; i++){
+            new Thread(){
+                @Override
+                public void run() {
+                    ChatTest chatTest = new ChatTest();
+                   /* try {
+                        //chatTest.register();
+                        //chatTest.login();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }*/
+                    try {
+                        chatTest.httpFlood();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    super.run();
+                }
+            }.start();
+        }
+
+
+
         ChatTest chatTest = new ChatTest();
+        //chatTest.register();
+        //chatTest.login();
+        chatTest.httpFlood();
+
+
+
+
+
         chatTest.register();
+
 
         new Thread(){
             @Override
@@ -63,6 +99,25 @@ public class ChatTest {
 
     }
 
+    public void httpFlood() throws IOException, URISyntaxException, InterruptedException {
+        for(int i=0; i<100; i++){
+            //URL url = new URL("http://localhost:8080/auth/register?name=nwm"+i+"&email=nwm"+i+"&password=1234");
+            //URL url = new URL("http://localhost:8080/auth/login?name=nwm1999&password=12345");
+            //URL url = new URL("http://localhost:8080/auth/login?name=nwm1&password=1234");
+            URL url = new URL("http://localhost:8080/test");
+            //URL url = new URL("http://localhost:8080/searchUser?name=nwm1");
+            HttpRequest request = HttpRequest.newBuilder()
+                    //.header("token", this.jwtToken)
+                    .uri(url.toURI()).build();
+
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            if(i%50==0){
+                System.out.println(i);
+            }
+        }
+
+    }
+
     public void login() throws IOException {
         URL url = new URL("http://localhost:8080/auth/login?name=nwm1&password=1234");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -76,7 +131,7 @@ public class ChatTest {
             content.append(inputLine);
         }
         this.jwtToken = content.toString();
-        System.out.println(this.jwtToken);
+        //System.out.println(this.jwtToken);
 
 
 
